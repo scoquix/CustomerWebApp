@@ -5,10 +5,7 @@ import com.scoquix.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,6 +27,16 @@ public class CustomerController {
         return "list-customers";
     }
 
+    @GetMapping("/search")
+    public String searchCustomerByName(@RequestParam("theCustomerName") String customerName, Model theModel){
+        //service to search
+        List<Customer> customers = customerService.searchByName(customerName);
+        //add the customers to model attribute
+        theModel.addAttribute("customers",customers);
+
+        return "list-customers";
+    }
+
     @GetMapping("/showFormForAdd")
     public String showFormForAdd(Model theModel){
         //create model attribute to bind form data
@@ -45,4 +52,27 @@ public class CustomerController {
 
         return "redirect:/customer/list";
     }
+
+    @GetMapping("/showFormForUpdate")
+    public String showFormForUpdate(@RequestParam("customerId") int customer, Model theModel){
+
+        //get the customer from the service
+        Customer theCostumer = customerService.getCustomers(customer);
+
+        //set a customer as a model attribute to pre-populate the form
+        theModel.addAttribute("customer", theCostumer);
+
+        //send over to our form
+        return "customer-form";
+    }
+
+    @GetMapping("/delete")
+    public String deleteCustomer(@RequestParam("deleteId") int customerId, Model theModel){
+        // get the customer from the service
+        customerService.deleteCustomer(customerId);
+        //return view without deleted customer
+        return "redirect:/customer/list";
+    }
+
+
 }
